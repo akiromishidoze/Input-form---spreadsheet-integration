@@ -61,7 +61,7 @@ const ADDRESS_FIELDS = [
   { id: 'country', label: 'Country', type: 'select', options: COUNTRIES },
 ];
 
-export default function PersonalForm({ onSubmit }) {
+export default function CustomerForm({ onSubmit }) {
   const init = () => ({
     ...Object.fromEntries(PERSONAL_FIELDS.map(f => [f.id, ''])),
     ...Object.fromEntries(ADDRESS_FIELDS.map(f => [f.id, f.id === 'country' ? 'Philippines' : ''])),
@@ -77,13 +77,13 @@ export default function PersonalForm({ onSubmit }) {
       alert('Please fill in all required fields.');
       return;
     }
-    onSubmit('Personal Info & Address', data);
+    onSubmit('Customer Details', data);
     setData(init());
   };
 
   return (
     <section className="tab-pane active">
-      <h2>Personal Information &amp; Address</h2>
+      <h2>Customer Details</h2>
       <form onSubmit={handleSubmit}>
         <h3 className="form-section-title">Personal Details</h3>
         {PERSONAL_FIELDS.map(f => (

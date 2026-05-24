@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
-import PersonalForm from './components/PersonalForm';
+import CustomerForm from './components/CustomerForm';
 import EmployeeForm from './components/EmployeeForm';
 import SpreadsheetView from './components/SpreadsheetView';
 import Toast from './components/Toast';
@@ -9,7 +9,7 @@ import { fetchEntries, addEntry, deleteEntry, clearEntries } from './api';
 const STORAGE_KEY = 'multiFormData';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('personal');
+  const [activeTab, setActiveTab] = useState('customer');
   const [entries, setEntries] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
@@ -103,7 +103,7 @@ export default function App() {
   }, [entries, showToast]);
 
   const tabs = {
-    personal: <PersonalForm onSubmit={handleSubmit} />,
+    customer: <CustomerForm onSubmit={handleSubmit} />,
     employee: <EmployeeForm onSubmit={handleSubmit} />,
     spreadsheet: (
       <SpreadsheetView
