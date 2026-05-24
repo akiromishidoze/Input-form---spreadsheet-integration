@@ -14,7 +14,13 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('personal');
   const [entries, setEntries] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type });
@@ -120,6 +126,8 @@ export default function App() {
         onTabChange={setActiveTab}
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(v => !v)}
+        darkMode={darkMode}
+        onToggleDark={() => setDarkMode(v => !v)}
       />
       <div className="main-area">
         <header>
