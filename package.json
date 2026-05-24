@@ -4,9 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch server/index.ts & vite",
-    "build": "vite build",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc --project tsconfig.server.json",
     "start": "tsx server/index.ts",
-    "typecheck": "tsc --noEmit && tsc --project tsconfig.server.json --noEmit"
+    "start:prod": "node dist-server/index.js",
+    "typecheck": "tsc --noEmit && tsc --project tsconfig.server.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",

@@ -178,11 +178,11 @@ export default function App() {
         darkMode={darkMode}
         onToggleDark={() => setDarkMode(v => !v)}
       />
-      <div className="main-area">
+      <div className="main-area" role="main">
         <header>
           <h1>Multi-Form &amp; Spreadsheet Dashboard</h1>
         </header>
-        <main className="tab-content">{tabs[activeTab]}</main>
+        <div className="tab-content">{tabs[activeTab]}</div>
       </div>
 
       {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}

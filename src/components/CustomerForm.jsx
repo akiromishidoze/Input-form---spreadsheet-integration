@@ -149,7 +149,7 @@ export default function CustomerForm({ onSubmit, submitting }) {
   );
 
   return (
-    <section className="tab-pane active">
+    <section className="tab-pane active" id="panel-customer" role="tabpanel" aria-label="Customer Details">
       <h2>Customer Details</h2>
       <form onSubmit={handleSubmit} noValidate>
         <h3 className="form-section-title">Personal Details</h3>

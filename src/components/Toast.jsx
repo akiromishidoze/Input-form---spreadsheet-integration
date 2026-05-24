@@ -7,7 +7,7 @@ export default function Toast({ msg, type = 'success', onClose }) {
   }, [onClose]);
 
   return (
-    <div className={`toast show ${type}`}>
+    <div className={`toast show ${type}`} role="status" aria-live="polite">
       {msg}
     </div>
   );

@@ -59,7 +59,7 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
   const labelify = (k) => k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
 
   return (
-    <section className="tab-pane active">
+    <section className="tab-pane active" id="panel-spreadsheet" role="tabpanel" aria-label="Spreadsheet">
       <h2>All Entries</h2>
 
       <div className="spreadsheet-controls">
@@ -68,6 +68,7 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
             type="text"
             className="search-input"
             placeholder="Search entries..."
+            aria-label="Search entries"
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
           />
