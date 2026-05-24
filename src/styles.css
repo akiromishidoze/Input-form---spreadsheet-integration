@@ -198,6 +198,21 @@ header h1 {
   padding-bottom: 0.5rem;
 }
 
+.form-section-title {
+  font-size: 1rem;
+  color: #16213e;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+}
+
+.tab-pane .form-section-title + .form-group {
+  margin-top: 0;
+}
+
+.form-section-title:not(:first-of-type) {
+  margin-top: 1.25rem;
+}
+
 /* ---- Forms ---- */
 .form-group {
   margin-bottom: 1rem;
@@ -423,6 +438,10 @@ tbody tr:hover {
 
 .dark header h1 {
   color: #e0e0e0;
+}
+
+.dark .form-section-title {
+  color: #ccc;
 }
 
 .dark .form-group label {
