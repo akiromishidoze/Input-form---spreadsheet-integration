@@ -39,6 +39,10 @@ export function add(id: string, form: string, data: Record<string, unknown>, sub
   insertStmt.run(id, form, JSON.stringify(data), submitted);
 }
 
+export function update(id: string, form: string, data: Record<string, unknown>, submitted: string): void {
+  db.prepare('UPDATE entries SET form = ?, data = ?, submitted = ? WHERE id = ?').run(form, JSON.stringify(data), submitted, id);
+}
+
 export function remove(id: string): void {
   db.prepare('DELETE FROM entries WHERE id = ?').run(id);
 }

@@ -1,6 +1,12 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, ReactNode } from 'react';
 
-const NAV_ITEMS = [
+interface NavItem {
+  id: string;
+  label: string;
+  icon: ReactNode;
+}
+
+const NAV_ITEMS: NavItem[] = [
   {
     id: 'customer',
     label: 'Customer Details',
@@ -24,9 +30,21 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, darkMode, onToggleDark }) {
-  const navRef = useRef(null);
-  const toggleBtnRef = useRef(null);
+interface SidebarProps {
+  activeTab: string;
+  onTabChange: (id: string) => void;
+  collapsed: boolean;
+  onToggle: () => void;
+  darkMode: boolean;
+  onToggleDark: () => void;
+  onLogout: () => void;
+  mobileOpen: boolean;
+  onMobileToggle: () => void;
+}
+
+export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, darkMode, onToggleDark, onLogout, mobileOpen, onMobileToggle }: SidebarProps) {
+  const navRef = useRef<HTMLDivElement>(null);
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const el = navRef.current;
@@ -35,7 +53,7 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, d
     const first = buttons[0];
     const last = buttons[buttons.length - 1];
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !collapsed) {
         onToggle();
         toggleBtnRef.current?.focus();
@@ -44,14 +62,14 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, d
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         e.preventDefault();
         const current = document.activeElement;
-        const next = current === last ? first : current.nextElementSibling || first;
-        next.focus();
+        const next = current === last ? first : current?.nextElementSibling || first;
+        (next as HTMLElement)?.focus();
       }
       if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         e.preventDefault();
         const current = document.activeElement;
-        const prev = current === first ? last : current.previousElementSibling || last;
-        prev.focus();
+        const prev = current === first ? last : current?.previousElementSibling || last;
+        (prev as HTMLElement)?.focus();
       }
     };
 
@@ -61,11 +79,25 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, d
 
   return (
     <nav
-      className={`sidebar${collapsed ? ' collapsed' : ''}`}
+      className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' mobile-open' : ''}`}
       aria-label="Main navigation"
       role="navigation"
     >
       <div className="sidebar-header">
+        <button
+          className="sidebar-hamburger"
+          onClick={onMobileToggle}
+          aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={mobileOpen}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {mobileOpen ? (
+              <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+            ) : (
+              <><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" /></>
+            )}
+          </svg>
+        </button>
         <div className="sidebar-logo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -90,7 +122,7 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, d
       </div>
 
       <div className="sidebar-nav" ref={navRef} role="tablist" aria-label="Tabs">
-        {NAV_ITEMS.map((item, i) => (
+        {NAV_ITEMS.map(item => (
           <button
             key={item.id}
             className={`nav-item${activeTab === item.id ? ' active' : ''}`}
@@ -135,7 +167,20 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, d
           </svg>
           {!collapsed && <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>}
         </button>
+        <button
+          className="theme-toggle logout-btn"
+          onClick={onLogout}
+          aria-label="Logout"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          {!collapsed && <span>Logout</span>}
+        </button>
       </div>
+      {mobileOpen && <div className="sidebar-backdrop" onClick={onMobileToggle} />}
     </nav>
   );
 }

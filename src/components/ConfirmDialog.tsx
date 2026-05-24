@@ -1,7 +1,13 @@
 import { useRef, useEffect } from 'react';
 
-export default function ConfirmDialog({ message, onConfirm, onCancel }) {
-  const boxRef = useRef(null);
+interface ConfirmDialogProps {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export default function ConfirmDialog({ message, onConfirm, onCancel }: ConfirmDialogProps) {
+  const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const box = boxRef.current;
@@ -11,7 +17,7 @@ export default function ConfirmDialog({ message, onConfirm, onCancel }) {
     const last = focusable[focusable.length - 1];
     first?.focus();
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { onCancel(); return; }
       if (e.key === 'Tab') {
         if (e.shiftKey && document.activeElement === first) {

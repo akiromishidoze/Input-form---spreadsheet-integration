@@ -94,6 +94,32 @@ body {
   flex-shrink: 0;
 }
 
+.sidebar-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #a6adc8;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar-hamburger:hover {
+  background: #2a2d3a;
+  color: #e0e3f0;
+}
+
+.sidebar-hamburger svg {
+  width: 18px;
+  height: 18px;
+}
+
 .sidebar-toggle:hover {
   background: #2a2d3a;
   color: #e0e3f0;
@@ -386,6 +412,10 @@ thead th.sortable:hover {
   background: #1f3050;
 }
 
+thead th:last-child {
+  width: 130px;
+}
+
 .sort-arrow {
   font-size: 0.7rem;
   margin-left: 0.25rem;
@@ -409,6 +439,21 @@ tbody tr:hover {
 
 .delete-btn:hover {
   background: #c0392b;
+}
+
+.edit-btn {
+  background: #2980b9;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  margin-right: 0.35rem;
+}
+
+.edit-btn:hover {
+  background: #1f6fa5;
+}
+
+.action-cell {
+  white-space: nowrap;
 }
 
 /* ---- Toast ---- */
@@ -509,17 +554,51 @@ button.modal-cancel:hover {
   .sidebar {
     width: 60px;
     min-width: 60px;
+    position: relative;
+  }
+  .sidebar.mobile-open {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1500;
+    width: 240px;
+    min-width: 240px;
   }
   .sidebar:not(.forced-open) .nav-label,
   .sidebar:not(.forced-open) .sidebar-logo span {
     display: none;
   }
+  .sidebar.mobile-open .nav-label,
+  .sidebar.mobile-open .sidebar-logo span {
+    display: inline;
+  }
   .sidebar-header {
     justify-content: center;
     padding: 1rem 0.5rem;
   }
+  .sidebar.mobile-open .sidebar-header {
+    justify-content: space-between;
+    padding: 1rem;
+  }
   .sidebar-toggle {
     display: none;
+  }
+  .sidebar-hamburger {
+    display: flex;
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+  }
+  .sidebar-footer button {
+    justify-content: center;
+    padding: 0.7rem 0;
+  }
+  .sidebar.mobile-open .sidebar-footer button {
+    justify-content: flex-start;
+    padding: 0.7rem 0.75rem;
   }
   .main-area {
     padding: 0.75rem;
@@ -599,6 +678,53 @@ button.modal-cancel:hover {
 .sidebar.collapsed .theme-toggle {
   justify-content: center;
   padding: 0.7rem 0;
+}
+
+.logout-btn {
+  border-top: 1px solid transparent;
+  margin-top: 0.25rem;
+}
+
+.logout-btn:hover {
+  color: #e74c3c;
+}
+
+/* ---- Login Page ---- */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.login-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  width: 360px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-box h1 {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #16213e;
+  text-align: center;
+}
+
+.dark .login-page {
+  background: #121212;
+}
+
+.dark .login-box {
+  background: #1e1e1e;
+}
+
+.dark .login-box h1 {
+  color: #e0e0e0;
 }
 
 /* ---- Dark Mode ---- */
@@ -694,6 +820,14 @@ button.modal-cancel:hover {
 
 .dark .delete-btn:hover {
   background: #a93226;
+}
+
+.dark .edit-btn {
+  background: #2471a3;
+}
+
+.dark .edit-btn:hover {
+  background: #1a5a82;
 }
 
 .dark thead th.sortable:hover {

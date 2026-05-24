@@ -3,9 +3,10 @@ import cors from 'cors';
 import path from 'path';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { getAll, getById, add, remove, clearAll } from './db';
+import { getAll, getById, add, update, remove, clearAll } from './db';
 import { validateEntry, sanitizeObject, sanitize } from './validation';
 import { errorHandler, AppError } from './errorHandler';
+import { loginHandler, authMiddleware } from './auth';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -21,6 +22,10 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use('/api/', limiter);
+
+app.post('/api/auth/login', loginHandler);
+
+app.use('/api/entries', authMiddleware);
 
 app.get('/api/entries', (_req: Request, res: Response) => {
   const entries = getAll().map(e => ({ ...e, data: JSON.parse(e.data) }));
@@ -45,6 +50,22 @@ app.post('/api/entries', (req: Request, res: Response) => {
 
   add(id, form, data, submitted);
   res.status(201).json({ id, form, data, submitted });
+});
+
+app.put('/api/entries/:id', (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const existing = getById(id);
+  if (!existing) throw new AppError(404, 'Entry not found');
+
+  const errs = validateEntry(req.body);
+  if (errs.length) throw new AppError(400, errs.map(e => e.message).join('; '));
+
+  const form = sanitize(req.body.form) as string;
+  const data = sanitizeObject((req.body.data ?? {}) as Record<string, unknown>);
+  const submitted = (req.body.submitted as string) || existing.submitted;
+
+  update(id, form, data, submitted);
+  res.json({ id, form, data, submitted });
 });
 
 app.delete('/api/entries/:id', (req: Request, res: Response) => {

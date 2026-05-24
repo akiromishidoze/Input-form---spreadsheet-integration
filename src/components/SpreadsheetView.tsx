@@ -1,14 +1,24 @@
 import { useState, useMemo } from 'react';
+import type { Entry } from '../api';
 
-export default function SpreadsheetView({ entries, onDelete, onClearAll, onExportCsv, loading }) {
+interface SpreadsheetViewProps {
+  entries: Entry[];
+  onDelete: (id: string) => void;
+  onClearAll: () => void;
+  onExportCsv: () => void;
+  onEdit: (entry: Entry) => void;
+  loading: boolean;
+}
+
+export default function SpreadsheetView({ entries, onDelete, onClearAll, onExportCsv, onEdit, loading }: SpreadsheetViewProps) {
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState(null);
-  const [sortDir, setSortDir] = useState('asc');
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(0);
   const PER_PAGE = 10;
 
   const allKeys = useMemo(() => {
-    const set = new Set();
+    const set = new Set<string>();
     entries.forEach(e => Object.keys(e.data).forEach(k => set.add(k)));
     return ['Form', 'Submitted', ...set];
   }, [entries]);
@@ -24,11 +34,11 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
     }
     if (sortKey) {
       result = [...result].sort((a, b) => {
-        let va, vb;
+        let va: string, vb: string;
         if (sortKey === 'Form') { va = a.form; vb = b.form; }
         else if (sortKey === 'Submitted') { va = a.submitted; vb = b.submitted; }
         else { va = String(a.data[sortKey] ?? ''); vb = String(b.data[sortKey] ?? ''); }
-        const cmp = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
+        const cmp = va.localeCompare(vb);
         return sortDir === 'asc' ? cmp : -cmp;
       });
     }
@@ -41,7 +51,7 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
     return filtered.slice(start, start + PER_PAGE);
   }, [filtered, page]);
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     if (sortKey === key) {
       setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     } else {
@@ -50,13 +60,13 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
     }
   };
 
-  const formatVal = (v) => {
+  const formatVal = (v: unknown): string => {
     if (v === null || v === undefined || v === '') return '\u2014';
     if (typeof v === 'boolean') return v ? 'Yes' : 'No';
     return String(v);
   };
 
-  const labelify = (k) => k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+  const labelify = (k: string): string => k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
 
   return (
     <section className="tab-pane active" id="panel-spreadsheet" role="tabpanel" aria-label="Spreadsheet">
@@ -106,7 +116,8 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
                       if (k === 'Form') return <td key={k}>{entry.form}</td>;
                       return <td key={k}>{formatVal(entry.data[k])}</td>;
                     })}
-                    <td>
+                    <td className="action-cell">
+                      <button className="edit-btn" onClick={() => onEdit(entry)}>Edit</button>
                       <button className="delete-btn" onClick={() => onDelete(entry.id)}>Delete</button>
                     </td>
                   </tr>
