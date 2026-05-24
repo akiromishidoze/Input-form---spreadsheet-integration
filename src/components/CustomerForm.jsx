@@ -61,10 +61,20 @@ const ADDRESS_FIELDS = [
   { id: 'country', label: 'Country', type: 'select', options: COUNTRIES },
 ];
 
+const ORDER_FIELDS = [
+  { id: 'orderId', label: 'Order ID', type: 'text', required: true },
+  { id: 'product', label: 'Product', type: 'text', required: true },
+  { id: 'quantity', label: 'Quantity', type: 'number', attrs: { min: 1 } },
+  { id: 'price', label: 'Price ($)', type: 'number', attrs: { min: 0, step: 0.01 } },
+  { id: 'orderDate', label: 'Order Date', type: 'date' },
+  { id: 'orderStatus', label: 'Status', type: 'select', options: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] },
+];
+
 export default function CustomerForm({ onSubmit }) {
   const init = () => ({
     ...Object.fromEntries(PERSONAL_FIELDS.map(f => [f.id, ''])),
     ...Object.fromEntries(ADDRESS_FIELDS.map(f => [f.id, f.id === 'country' ? 'Philippines' : ''])),
+    ...Object.fromEntries(ORDER_FIELDS.map(f => [f.id, ''])),
   });
 
   const [data, setData] = useState(init);
@@ -72,7 +82,7 @@ export default function CustomerForm({ onSubmit }) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    const missing = [...PERSONAL_FIELDS, ...ADDRESS_FIELDS].some(f => f.required && !data[f.id]);
+    const missing = [...PERSONAL_FIELDS, ...ADDRESS_FIELDS, ...ORDER_FIELDS].some(f => f.required && !data[f.id]);
     if (missing) {
       alert('Please fill in all required fields.');
       return;
@@ -101,6 +111,33 @@ export default function CustomerForm({ onSubmit }) {
 
         <h3 className="form-section-title">Address</h3>
         {ADDRESS_FIELDS.map(f => (
+          <div className="form-group" key={f.id}>
+            <label htmlFor={f.id}>{f.label}</label>
+            {f.type === 'select' ? (
+              <select
+                id={f.id}
+                required={f.required}
+                value={data[f.id]}
+                onChange={e => handleChange(f.id, e.target.value)}
+              >
+                <option value="">-- Select --</option>
+                {f.options.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            ) : (
+              <input
+                type={f.type}
+                id={f.id}
+                required={f.required}
+                {...f.attrs}
+                value={data[f.id]}
+                onChange={e => handleChange(f.id, e.target.value)}
+              />
+            )}
+          </div>
+        ))}
+
+        <h3 className="form-section-title">Order Info</h3>
+        {ORDER_FIELDS.map(f => (
           <div className="form-group" key={f.id}>
             <label htmlFor={f.id}>{f.label}</label>
             {f.type === 'select' ? (
