@@ -36,18 +36,6 @@ export default function App() {
     setToast({ msg, type });
   }, []);
 
-  const handleLogin = useCallback(async (username: string, password: string) => {
-    await login(username, password);
-    setAuthenticated(true);
-    loadFromServer();
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    clearToken();
-    setAuthenticated(false);
-    setEntries([]);
-  }, []);
-
   const loadFromServer = useCallback(async () => {
     setLoading(true);
     try {
@@ -84,6 +72,21 @@ export default function App() {
       showToast(`${remaining.length} pending entries waiting to sync`, 'error');
     }
   }
+
+  const handleLogin = useCallback(async (username: string, password: string) => {
+    await login(username, password);
+    setAuthenticated(true);
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    clearToken();
+    setAuthenticated(false);
+    setEntries([]);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    loadFromServer();
+  }, [loadFromServer]);
 
   useEffect(() => { if (authenticated) loadFromServer(); }, [loadFromServer, authenticated]);
 
@@ -230,6 +233,7 @@ export default function App() {
               onClearAll={handleClearAll}
               onExportCsv={handleExportCsv}
               onEdit={handleEditStart}
+              onRefresh={handleRefresh}
               loading={loading}
             />
           )}

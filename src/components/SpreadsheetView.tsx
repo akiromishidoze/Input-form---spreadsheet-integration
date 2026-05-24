@@ -7,10 +7,11 @@ interface SpreadsheetViewProps {
   onClearAll: () => void;
   onExportCsv: () => void;
   onEdit: (entry: Entry) => void;
+  onRefresh: () => void;
   loading: boolean;
 }
 
-export default function SpreadsheetView({ entries, onDelete, onClearAll, onExportCsv, onEdit, loading }: SpreadsheetViewProps) {
+export default function SpreadsheetView({ entries, onDelete, onClearAll, onExportCsv, onEdit, onRefresh, loading }: SpreadsheetViewProps) {
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -83,15 +84,35 @@ export default function SpreadsheetView({ entries, onDelete, onClearAll, onExpor
             onChange={e => { setSearch(e.target.value); setPage(0); }}
           />
         </div>
+        <button className="refresh-btn" onClick={onRefresh} disabled={loading} aria-label="Refresh data">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+          {loading ? 'Refreshing...' : 'Refresh'}
+        </button>
         <button onClick={onExportCsv}>Export CSV</button>
         <button className="danger" onClick={onClearAll}>Clear All Data</button>
       </div>
 
       <div className="table-wrapper">
         {loading ? (
-          <div className="table-status">Loading entries...</div>
+          <div className="table-status loading-state">
+            <div className="spinner" />
+            <span>Loading entries...</span>
+          </div>
         ) : !entries.length ? (
-          <div className="table-status">No entries yet.</div>
+          <div className="table-status empty-state">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="empty-icon">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            <p className="empty-title">No entries yet</p>
+            <p className="empty-hint">Fill out the Customer Details form to add your first entry.</p>
+          </div>
         ) : !filtered.length ? (
           <div className="table-status">No entries match your search.</div>
         ) : (

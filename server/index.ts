@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { getAll, getById, add, update, remove, clearAll } from './db';
+import { getAll, getById, getCount, getPaginated, add, update, remove, clearAll } from './db';
 import { validateEntry, sanitizeObject, sanitize } from './validation';
 import { errorHandler, AppError } from './errorHandler';
 import { loginHandler, authMiddleware } from './auth';
@@ -23,13 +23,21 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), uptime: process.uptime() });
+});
+
 app.post('/api/auth/login', loginHandler);
 
 app.use('/api/entries', authMiddleware);
 
-app.get('/api/entries', (_req: Request, res: Response) => {
-  const entries = getAll().map(e => ({ ...e, data: JSON.parse(e.data) }));
-  res.json(entries);
+app.get('/api/entries', (req: Request, res: Response) => {
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
+  const total = getCount();
+  const rows = getPaginated(page, limit);
+  const entries = rows.map(e => ({ ...e, data: JSON.parse(e.data) }));
+  res.json({ entries, total, page, limit, totalPages: Math.ceil(total / limit) });
 });
 
 app.get('/api/entries/:id', (req: Request, res: Response) => {

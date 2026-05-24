@@ -37,10 +37,19 @@ export async function login(username: string, password: string): Promise<string>
   return data.token;
 }
 
-export async function fetchEntries(): Promise<Entry[]> {
-  const res = await fetch(API, { headers: authHeaders() });
+export interface PaginatedResult {
+  entries: Entry[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export async function fetchEntries(page = 1, limit = 10000): Promise<Entry[]> {
+  const res = await fetch(`${API}?page=${page}&limit=${limit}`, { headers: authHeaders() });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const result: PaginatedResult = await res.json();
+  return result.entries;
 }
 
 export async function addEntry(formName: string, data: Record<string, unknown>): Promise<Entry> {

@@ -31,6 +31,16 @@ export function getAll(): EntryRow[] {
   return db.prepare('SELECT * FROM entries ORDER BY rowid DESC').all() as EntryRow[];
 }
 
+export function getCount(): number {
+  const row = db.prepare('SELECT COUNT(*) as count FROM entries').get() as { count: number };
+  return row.count;
+}
+
+export function getPaginated(page: number, limit: number): EntryRow[] {
+  const offset = (page - 1) * limit;
+  return db.prepare('SELECT * FROM entries ORDER BY rowid DESC LIMIT ? OFFSET ?').all(limit, offset) as EntryRow[];
+}
+
 export function getById(id: string): EntryRow | undefined {
   return db.prepare('SELECT * FROM entries WHERE id = ?').get(id) as EntryRow | undefined;
 }

@@ -293,6 +293,7 @@ header h1 {
 input[type="text"],
 input[type="email"],
 input[type="tel"],
+input[type="password"],
 input[type="number"],
 input[type="date"],
 select,
@@ -382,6 +383,75 @@ button.danger:hover {
   color: #888;
   padding: 2rem 0;
   font-size: 0.95rem;
+}
+
+.table-status.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e0e3e8;
+  border-top-color: #16213e;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.dark .spinner {
+  border-color: #333;
+  border-top-color: #5b8def;
+}
+
+.table-status.empty-state {
+  padding: 3rem 0;
+}
+
+.empty-icon {
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.dark .empty-icon {
+  color: #444;
+}
+
+.empty-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.3rem;
+}
+
+.dark .empty-title {
+  color: #999;
+}
+
+.empty-hint {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.dark .empty-hint {
+  color: #777;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dark .refresh-btn:disabled {
+  opacity: 0.5;
 }
 
 .table-wrapper {
@@ -694,8 +764,8 @@ button.modal-cancel:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100vw;
-  height: 100vh;
+  flex: 1;
+  min-height: 100vh;
   background: #f0f2f5;
 }
 
@@ -762,6 +832,7 @@ button.modal-cancel:hover {
 .dark input[type="text"],
 .dark input[type="email"],
 .dark input[type="tel"],
+.dark input[type="password"],
 .dark input[type="number"],
 .dark input[type="date"],
 .dark select,
