@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import CustomerForm from './components/CustomerForm';
 import SpreadsheetView from './components/SpreadsheetView';
 import Toast from './components/Toast';
+import ConfirmDialog from './components/ConfirmDialog';
 import { fetchEntries, addEntry, deleteEntry, clearEntries } from './api';
 
 const STORAGE_KEY = 'multiFormData';
@@ -17,6 +18,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
+  const [confirm, setConfirm] = useState(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -36,11 +38,12 @@ export default function App() {
       await syncPending();
     } catch (err) {
       console.warn('Server fetch failed, loading from cache:', err);
+      showToast('Server unreachable, showing cached data', 'error');
       const cached = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
       setEntries(cached);
     }
     setLoading(false);
-  }, []);
+  }, [showToast]);
 
   async function syncPending() {
     const pending = JSON.parse(localStorage.getItem(PENDING_KEY)) || [];
@@ -91,28 +94,40 @@ export default function App() {
   }, [showToast]);
 
   const handleDelete = useCallback(async (id) => {
-    if (!confirm('Delete this entry?')) return;
-    try {
-      await deleteEntry(id);
-      setEntries(prev => prev.filter(e => e.id !== id));
-      showToast('Entry deleted.');
-    } catch (err) {
-      console.warn('Delete failed:', err);
-      showToast('Delete failed', 'error');
-    }
+    setConfirm({
+      message: 'Delete this entry?',
+      onConfirm: async () => {
+        setConfirm(null);
+        try {
+          await deleteEntry(id);
+          setEntries(prev => prev.filter(e => e.id !== id));
+          showToast('Entry deleted.');
+        } catch (err) {
+          console.warn('Delete failed:', err);
+          showToast('Delete failed', 'error');
+        }
+      },
+      onCancel: () => setConfirm(null),
+    });
   }, [showToast]);
 
   const handleClearAll = useCallback(async () => {
     if (!entries.length) return;
-    if (!confirm('Delete ALL entries?')) return;
-    try {
-      await clearEntries();
-      setEntries([]);
-      showToast('All data cleared.');
-    } catch (err) {
-      console.warn('Clear failed:', err);
-      showToast('Clear failed', 'error');
-    }
+    setConfirm({
+      message: 'Delete ALL entries? This cannot be undone.',
+      onConfirm: async () => {
+        setConfirm(null);
+        try {
+          await clearEntries();
+          setEntries([]);
+          showToast('All data cleared.');
+        } catch (err) {
+          console.warn('Clear failed:', err);
+          showToast('Clear failed', 'error');
+        }
+      },
+      onCancel: () => setConfirm(null),
+    });
   }, [entries, showToast]);
 
   const handleExportCsv = useCallback(() => {
@@ -171,6 +186,7 @@ export default function App() {
       </div>
 
       {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
+      {confirm && <ConfirmDialog {...confirm} />}
     </div>
   );
 }

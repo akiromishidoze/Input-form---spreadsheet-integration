@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const DRAFT_KEY = 'formDraft_customer';
 
 const PERSONAL_FIELDS = [
   { id: 'firstName', label: 'First Name', type: 'text', required: true },
@@ -73,14 +75,24 @@ const ORDER_FIELDS = [
 const ALL_FIELDS = [...PERSONAL_FIELDS, ...ADDRESS_FIELDS, ...ORDER_FIELDS];
 
 export default function CustomerForm({ onSubmit, submitting }) {
-  const init = () => ({
-    ...Object.fromEntries(PERSONAL_FIELDS.map(f => [f.id, ''])),
-    ...Object.fromEntries(ADDRESS_FIELDS.map(f => [f.id, f.id === 'country' ? 'Philippines' : ''])),
-    ...Object.fromEntries(ORDER_FIELDS.map(f => [f.id, ''])),
-  });
+  const init = () => {
+    const saved = localStorage.getItem(DRAFT_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return {
+      ...Object.fromEntries(PERSONAL_FIELDS.map(f => [f.id, ''])),
+      ...Object.fromEntries(ADDRESS_FIELDS.map(f => [f.id, f.id === 'country' ? 'Philippines' : ''])),
+      ...Object.fromEntries(ORDER_FIELDS.map(f => [f.id, ''])),
+    };
+  };
 
   const [data, setData] = useState(init);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); }, [data]);
 
   const handleChange = (id, value) => {
     setData(prev => ({ ...prev, [id]: value }));
@@ -104,6 +116,7 @@ export default function CustomerForm({ onSubmit, submitting }) {
     onSubmit('Customer Details', data);
     setData(init());
     setErrors({});
+    localStorage.removeItem(DRAFT_KEY);
   };
 
   const renderField = f => (
