@@ -460,6 +460,10 @@ tbody tr:hover {
   color: #e0e0e0;
 }
 
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
 .dark input:focus,
 .dark select:focus,
 .dark textarea:focus {
