@@ -120,7 +120,6 @@ export default function CustomerForm({ onSubmit }) {
                 value={data[f.id]}
                 onChange={e => handleChange(f.id, e.target.value)}
               >
-                <option value="">-- Select --</option>
                 {f.options.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
             ) : (

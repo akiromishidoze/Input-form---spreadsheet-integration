@@ -19,9 +19,11 @@ export async function addEntry(formName, data) {
 }
 
 export async function deleteEntry(id) {
-  await fetch(`${API}/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
 export async function clearEntries() {
-  await fetch(API, { method: 'DELETE' });
+  const res = await fetch(API, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }

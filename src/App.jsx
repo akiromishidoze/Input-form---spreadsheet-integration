@@ -7,6 +7,8 @@ import { fetchEntries, addEntry, deleteEntry, clearEntries } from './api';
 
 const STORAGE_KEY = 'multiFormData';
 
+const PENDING_KEY = 'pendingEntries';
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('customer');
   const [entries, setEntries] = useState([]);
@@ -28,11 +30,34 @@ export default function App() {
       const data = await fetchEntries();
       setEntries(data);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch {
+      await syncPending();
+    } catch (err) {
+      console.warn('Server fetch failed, loading from cache:', err);
       const cached = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
       setEntries(cached);
     }
   }, []);
+
+  async function syncPending() {
+    const pending = JSON.parse(localStorage.getItem(PENDING_KEY)) || [];
+    if (!pending.length) return;
+    const remaining = [];
+    for (const entry of pending) {
+      try {
+        const result = await addEntry(entry.form, entry.data);
+        setEntries(prev => {
+          const filtered = prev.filter(e => e.id !== entry.id);
+          return [result, ...filtered];
+        });
+      } catch {
+        remaining.push(entry);
+      }
+    }
+    localStorage.setItem(PENDING_KEY, JSON.stringify(remaining));
+    if (remaining.length) {
+      showToast(`${remaining.length} pending entries waiting to sync`, 'error');
+    }
+  }
 
   useEffect(() => { loadFromServer(); }, [loadFromServer]);
 
@@ -40,28 +65,34 @@ export default function App() {
     try {
       const entry = await addEntry(formName, data);
       setEntries(prev => [entry, ...prev]);
-    } catch {
-      const fallback = {
-        id: Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        form: formName,
-        data: { ...data },
-        submitted: new Date().toISOString(),
-      };
-      setEntries(prev => [fallback, ...prev]);
-      showToast('Server save failed, saved locally', 'error');
+      showToast(`${formName} saved!`);
+      return;
+    } catch (err) {
+      console.warn('Server save failed:', err);
     }
-    showToast(`${formName} saved!`);
+    const fallback = {
+      id: Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      form: formName,
+      data: { ...data },
+      submitted: new Date().toISOString(),
+    };
+    setEntries(prev => [fallback, ...prev]);
+    const pending = JSON.parse(localStorage.getItem(PENDING_KEY)) || [];
+    pending.push(fallback);
+    localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    showToast('Server save failed, saved locally', 'error');
   }, [showToast]);
 
   const handleDelete = useCallback(async (id) => {
     if (!confirm('Delete this entry?')) return;
     try {
       await deleteEntry(id);
-    } catch {
-      /* ok */
+      setEntries(prev => prev.filter(e => e.id !== id));
+      showToast('Entry deleted.');
+    } catch (err) {
+      console.warn('Delete failed:', err);
+      showToast('Delete failed', 'error');
     }
-    setEntries(prev => prev.filter(e => e.id !== id));
-    showToast('Entry deleted.');
   }, [showToast]);
 
   const handleClearAll = useCallback(async () => {
@@ -69,11 +100,12 @@ export default function App() {
     if (!confirm('Delete ALL entries?')) return;
     try {
       await clearEntries();
-    } catch {
-      /* ok */
+      setEntries([]);
+      showToast('All data cleared.');
+    } catch (err) {
+      console.warn('Clear failed:', err);
+      showToast('Clear failed', 'error');
     }
-    setEntries([]);
-    showToast('All data cleared.');
   }, [entries, showToast]);
 
   const handleExportCsv = useCallback(() => {
