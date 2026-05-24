@@ -14,6 +14,8 @@ export default function App() {
   const [entries, setEntries] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function App() {
   }, []);
 
   const loadFromServer = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await fetchEntries();
       setEntries(data);
@@ -36,6 +39,7 @@ export default function App() {
       const cached = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
       setEntries(cached);
     }
+    setLoading(false);
   }, []);
 
   async function syncPending() {
@@ -62,14 +66,17 @@ export default function App() {
   useEffect(() => { loadFromServer(); }, [loadFromServer]);
 
   const handleSubmit = useCallback(async (formName, data) => {
+    setSubmitting(true);
     try {
       const entry = await addEntry(formName, data);
       setEntries(prev => [entry, ...prev]);
       showToast(`${formName} saved!`);
+      setSubmitting(false);
       return;
     } catch (err) {
       console.warn('Server save failed:', err);
     }
+    setSubmitting(false);
     const fallback = {
       id: Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       form: formName,
@@ -134,13 +141,14 @@ export default function App() {
   }, [entries, showToast]);
 
   const tabs = {
-    customer: <CustomerForm onSubmit={handleSubmit} />,
+    customer: <CustomerForm onSubmit={handleSubmit} submitting={submitting} />,
     spreadsheet: (
       <SpreadsheetView
         entries={entries}
         onDelete={handleDelete}
         onClearAll={handleClearAll}
         onExportCsv={handleExportCsv}
+        loading={loading}
       />
     ),
   };
