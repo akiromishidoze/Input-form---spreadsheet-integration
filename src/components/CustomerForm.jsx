@@ -65,7 +65,7 @@ const ORDER_FIELDS = [
   { id: 'orderId', label: 'Order ID', type: 'text', required: true },
   { id: 'product', label: 'Product', type: 'text', required: true },
   { id: 'quantity', label: 'Quantity', type: 'number', attrs: { min: 1 } },
-  { id: 'price', label: 'Price ($)', type: 'number', attrs: { min: 0, step: 0.01 } },
+  { id: 'price', label: 'Price (₱)', type: 'number', attrs: { min: 0, step: 0.01 } },
   { id: 'orderDate', label: 'Order Date', type: 'date' },
   { id: 'orderStatus', label: 'Status', type: 'select', options: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] },
 ];
