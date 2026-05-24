@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import CustomerForm from './components/CustomerForm';
-import EmployeeForm from './components/EmployeeForm';
 import SpreadsheetView from './components/SpreadsheetView';
 import Toast from './components/Toast';
 import { fetchEntries, addEntry, deleteEntry, clearEntries } from './api';
@@ -104,7 +103,6 @@ export default function App() {
 
   const tabs = {
     customer: <CustomerForm onSubmit={handleSubmit} />,
-    employee: <EmployeeForm onSubmit={handleSubmit} />,
     spreadsheet: (
       <SpreadsheetView
         entries={entries}
