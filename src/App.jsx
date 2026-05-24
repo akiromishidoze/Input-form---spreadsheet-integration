@@ -3,7 +3,6 @@ import Sidebar from './components/Sidebar';
 import PersonalForm from './components/PersonalForm';
 import EmployeeForm from './components/EmployeeForm';
 import AddressForm from './components/AddressForm';
-import FeedbackForm from './components/FeedbackForm';
 import SpreadsheetView from './components/SpreadsheetView';
 import Toast from './components/Toast';
 import { fetchEntries, addEntry, deleteEntry, clearEntries } from './api';
@@ -108,7 +107,6 @@ export default function App() {
     personal: <PersonalForm onSubmit={handleSubmit} />,
     employee: <EmployeeForm onSubmit={handleSubmit} />,
     address: <AddressForm onSubmit={handleSubmit} />,
-    feedback: <FeedbackForm onSubmit={handleSubmit} />,
     spreadsheet: (
       <SpreadsheetView
         entries={entries}

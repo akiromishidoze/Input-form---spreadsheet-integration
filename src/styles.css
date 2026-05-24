@@ -263,24 +263,6 @@ button.danger:hover {
   background: #c0392b;
 }
 
-/* ---- Star Rating ---- */
-.star-rating {
-  display: flex;
-  gap: 4px;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
-.star {
-  color: #ddd;
-  transition: color 0.15s;
-  user-select: none;
-}
-
-.star.active {
-  color: #f1c40f;
-}
-
 /* ---- Spreadsheet ---- */
 .spreadsheet-controls {
   display: flex;
@@ -477,10 +459,6 @@ tbody tr:hover {
 
 .dark thead th {
   background: #0d0d0d;
-}
-
-.dark .star {
-  color: #444;
 }
 
 .dark .toast {
